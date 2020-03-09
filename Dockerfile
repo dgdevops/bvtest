@@ -1,14 +1,11 @@
-FROM ubuntu:18.04
+FROM openjdk:8-jdk-alpine
 EXPOSE 8888
 
-WORKDIR /var
-RUN apt-get update
-RUN apt-get install git -y
-RUN apt install openjdk-8-jdk -y
-RUN export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-RUN apt install maven -y
-RUN git clone https://github.com/dgdevops/bvtest.git
-RUN cd ./springboot-web
-RUN export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-RUN ./mvnw clean install
-RUN ./mvnw spring-boot:run &
+RUN apk add --no-cache git
+RUN mkdir /var/web-app
+RUN git clone https://github.com/dgdevops/bvtest.git /var/web-app 
+WORKDIR /var/web-app/springboot-app/ 
+ARG JAR_FILE=target/demo-0.0.1-SNAPSHOT.jar
+WORKDIR /
+ADD ${JAR_FILE} websocket-demo.jar
+ENTRYPOINT ["java","-jar","-Dserver.port=8888","/websocket-demo.jar"]
